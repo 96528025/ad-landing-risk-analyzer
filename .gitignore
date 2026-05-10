@@ -1,0 +1,14 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+storage/scans.sqlite3
+storage/screenshots/
+storage/geo_environments.json
+
+.streamlit/secrets.toml

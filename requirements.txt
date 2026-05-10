@@ -1,0 +1,8 @@
+beautifulsoup4==4.12.3
+fastapi==0.115.6
+playwright==1.59.0
+openai>=2.36.0
+pydantic==2.10.4
+python-multipart==0.0.20
+streamlit==1.41.1
+uvicorn[standard]==0.34.0

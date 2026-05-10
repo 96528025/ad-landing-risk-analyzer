@@ -1,0 +1,37 @@
+{
+  "environments": [
+    {
+      "name": "us_desktop",
+      "proxy": {
+        "server": "http://us-proxy.example.com:8080",
+        "username": "optional_username",
+        "password": "optional_password"
+      },
+      "locale": "en-US",
+      "timezone_id": "America/Los_Angeles",
+      "viewport": {"width": 1365, "height": 900}
+    },
+    {
+      "name": "sg_desktop",
+      "proxy": {
+        "server": "http://sg-proxy.example.com:8080",
+        "username": "optional_username",
+        "password": "optional_password"
+      },
+      "locale": "en-SG",
+      "timezone_id": "Asia/Singapore",
+      "viewport": {"width": 1365, "height": 900}
+    },
+    {
+      "name": "id_mobile",
+      "proxy": {
+        "server": "http://id-proxy.example.com:8080",
+        "username": "optional_username",
+        "password": "optional_password"
+      },
+      "locale": "id-ID",
+      "timezone_id": "Asia/Jakarta",
+      "viewport": {"width": 390, "height": 844}
+    }
+  ]
+}

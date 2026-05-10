@@ -1,0 +1,4 @@
+url,is_risky,policy_labels,reviewer,notes
+https://example.com,false,,demo_reviewer,Known benign test page
+https://bonus-wallet.xyz/start,true,Financial / Crypto Promotion|Deceptive Earnings Claim|Suspicious Domain,demo_reviewer,Synthetic high-risk landing page
+https://pornhub.com,true,Adult / Sexual Content|Age Gate / Restricted Content,demo_reviewer,Sensitive content example
