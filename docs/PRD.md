@@ -1,651 +1,579 @@
-# PRD: AI-Powered Ad Landing Page Downstream Risk Analysis System
+# PRD: AI-Assisted Ad Landing Page Risk Review System
 
 ## English Version
 
-### 1. Background
+### 1. Product Context
 
-In international advertising review, risk is not limited to the ad creative itself. A compliant-looking ad may redirect users to a risky landing page after click. Downstream pages can expose users to phishing, forced downloads, deceptive financial claims, adult or sensitive content, hidden text, misleading redirects, or environment-based cloaking.
+In advertising review, downstream risk often appears after the user clicks the ad. A creative may look compliant, but the landing page can redirect to phishing forms, fake investment claims, forced downloads, sensitive content, or environment-specific cloaking pages.
 
-Traditional manual review is not enough for these cases because downstream risk may only appear after redirects, scrolling, clicking, form interaction, device-specific rendering, ad referer access, or geo-specific delivery.
+The product opportunity is to help reviewers inspect landing pages faster and more consistently, while giving policy, risk operations, and AI teams structured evidence for governance and model improvement.
 
-This project proposes an AI-powered downstream landing page risk analysis system that combines browser automation, rule-based signal extraction, LLM semantic review, screenshot vision, cloaking detection, evidence generation, and evaluation metrics.
+### 2. User Problem
 
-### 2. Problem Statement
+Current manual review has several pain points:
 
-Ad downstream review has several core challenges:
-
-- Risk can be hidden after user interaction, redirects, or environment-specific rendering.
-- Rule-only systems are brittle and can create false positives from weak keyword matches.
-- LLM-only systems need evidence guardrails to avoid unsupported policy labels.
-- Reviewers need clear evidence, not just a black-box risk score.
-- Product and model teams need measurable metrics to evaluate improvement.
-
-The goal is not to build a simple URL crawler. The goal is to build a downstream risk intelligence tool that supports ad review, risk strategy, and AI model improvement.
+- Reviewers must manually open links, inspect redirects, check forms, and capture evidence.
+- Risk may only appear after user interaction or under mobile, ad referer, or geo-specific conditions.
+- Review decisions can vary because evidence collection is not standardized.
+- Policy teams have limited visibility into repeated downstream risk patterns.
+- AI/model teams lack structured, evidence-backed samples for training and evaluation.
 
 ### 3. Target Users
 
-- Ad reviewers: review evidence and make approve or reject decisions.
-- Risk strategy product managers: analyze risk patterns, tune policies, and define thresholds.
-- Model and AI teams: use structured risk signals and reviewer feedback to improve policy understanding.
-- Policy teams: validate labels and refine enforcement guidelines.
+- Primary user: ad reviewer.
+- Secondary users: risk operations, policy team, AI/model team, data team, risk PM.
 
-### 4. Product Goals
+User needs:
 
-MVP goals:
+- Ad reviewers need fast evidence collection and explainable risk reasons.
+- Risk operations need consistent workflows and quality monitoring.
+- Policy teams need structured examples for enforcement guidelines.
+- AI/model teams need labeled evidence and false-positive cases.
+- PMs need metrics to evaluate whether the product improves review quality.
 
-- Automatically crawl a submitted landing page URL.
-- Extract title, visible text, hidden text, links, forms, redirects, download signals, and screenshots.
-- Produce explainable risk score, risk level, policy labels, confidence, and evidence.
-- Simulate limited downstream user flow with Playwright.
-- Use LLM semantic reasoning to understand page intent and reduce false positives.
-- Provide evaluation metrics for measuring system quality.
+### 4. Goals and Non-Goals
 
-North star goal:
+Product goals:
 
-Build a scalable AI-assisted review system that improves downstream risk discovery while reducing manual review effort and false positives.
+- Reduce manual review effort for landing page inspection.
+- Increase downstream risk discovery.
+- Provide evidence-backed risk labels instead of black-box decisions.
+- Support reviewer trust through screenshots, redirect chains, form evidence, matched context, and false-positive notes.
+- Create a measurable feedback loop for policy and AI improvements.
 
-### 5. Risk Scope
+Non-goals for MVP:
 
-In scope:
+- Fully automated enforcement with no human review.
+- Malware binary reverse engineering.
+- Payment transaction monitoring.
+- Copyright ownership verification.
+- Real geo cloaking detection without regional proxy infrastructure.
 
-- Phishing and credential collection
-- Adult or sensitive content
-- Deceptive financial or crypto claims
-- Forced download or suspicious download CTA
-- Hidden text or cloaking-like content hiding
-- Misleading redirect chains
-- User data collection through forms
-- Age gate, login wall, and cookie consent detection
-- Device, User-Agent, and referer-based environment mismatch
-- Geo cloaking framework with real regional proxies
+### 5. MVP Requirements
 
-Out of scope:
+#### 5.1 URL Scan
 
-- Copyright or media ownership verification
-- Malware binary reverse engineering
-- Payment transaction monitoring
-- Real geo cloaking without regional proxy infrastructure
-- User identity verification
+Reviewer can submit a landing page URL and receive a structured scan result.
 
-### 6. Product Workflow
+Requirements:
 
-```text
-Input landing page URL
-→ Playwright browser crawl
-→ DOM, text, form, link, redirect, and screenshot extraction
-→ Rule-based signal scoring
-→ Dynamic user-flow simulation
-→ Screenshot vision and LLM semantic review
-→ LLM label guardrail and hybrid score fusion
-→ Policy labels, evidence, confidence, and false-positive notes
-→ Evaluation metrics dashboard
-```
+- Normalize and validate URL.
+- Open page using browser automation.
+- Capture final URL and redirect chain.
+- Save screenshot.
+- Persist scan result for later review.
 
-### 7. Core Capabilities
+#### 5.2 Evidence Extraction
 
-#### 7.1 Static Risk Scan
+The system extracts reviewer-facing evidence.
 
-The system opens the URL with Playwright and extracts:
+Requirements:
 
-- Page title
-- Visible text
-- Hidden text
-- Links
-- Redirect chain
-- Forms and input fields
-- Password and phone fields
-- Download CTA
-- Risk terms and context snippets
-- Screenshot
+- Page title and visible text.
+- Hidden text blocks.
+- Links and destination URLs.
+- Forms and input fields.
+- Password and phone field detection.
+- Download CTA and forced-download detection.
+- Risk term matches with context snippets.
 
-The rule layer provides a stable and explainable baseline score.
+#### 5.3 Risk Scoring and Labels
 
-#### 7.2 Dynamic User Simulation
+The system provides an explainable baseline score.
 
-The system simulates a controlled user journey:
+Requirements:
 
-- Scroll the page
-- Detect consent prompts
-- Rank clickable actions by risk priority
-- Click high-priority CTAs when safe
-- Fill fake data into visible forms
-- Save each step URL and screenshot
-- Stop on age gates or repeated page states
+- Convert extracted signals into risk score, risk level, policy labels, reasons, and confidence.
+- Show evidence for every major finding.
+- Add false-positive notes for weak or ambiguous signals.
+- Cap score at 100 and use Low, Medium, High levels.
 
-The action policy prioritizes risky downstream paths such as download, claim, sign up, register, subscribe, or payment-related CTAs, while avoiding unsafe actions such as entering age-restricted content.
+#### 5.4 Optional Dynamic Exploration
 
-#### 7.3 LLM Semantic Review
+The system can simulate limited downstream user behavior.
 
-Rules are strong at extracting stable signals, but weak at understanding semantic intent. The LLM layer is used for:
+Requirements:
 
-- Page intent classification
-- Policy label suggestion
-- Semantic false-positive analysis
-- Reviewer-friendly summary
-- Screenshot visual observation
+- Scroll page.
+- Detect candidate CTA buttons.
+- Prioritize risky actions such as download, claim, register, subscribe, payment, or sign up.
+- Fill fake data only into safe visible forms.
+- Stop around age gates or repeated states.
+- Save downstream URLs and screenshots.
 
-The LLM receives structured evidence instead of raw unbounded webpage data:
+#### 5.5 Optional LLM Semantic Review
 
-```json
-{
-  "url": "...",
-  "title": "...",
-  "visible_text_excerpt": "...",
-  "forms": [],
-  "redirect_chain": [],
-  "risk_term_evidence": {},
-  "automation_steps": [],
-  "rule_findings": []
-}
-```
+The LLM layer supports reviewer interpretation, not direct enforcement.
 
-The model returns structured output:
+Requirements:
 
-```json
-{
-  "page_intent": "adult_content",
-  "policy_labels": ["Adult / Sexual Content"],
-  "llm_risk_score": 75,
-  "confidence": 0.9,
-  "reviewer_summary": "...",
-  "false_positive_assessment": [],
-  "supporting_evidence": [],
-  "visual_observations": []
-}
-```
+- Send structured evidence, not raw unbounded page content.
+- Return page intent, suggested policy labels, risk score, confidence, reviewer summary, false-positive assessment, and supporting evidence.
+- Apply label guardrails so unsupported LLM labels are rejected or flagged.
+- Blend rule score and LLM score only when confidence is sufficient.
 
-#### 7.4 LLM Guardrails
+#### 5.6 Optional Cloaking Check
 
-To avoid hallucinated policy labels, the system applies label guardrails:
+The system can compare page behavior across environments.
 
-- The LLM can suggest labels.
-- Final accepted labels must be supported by rule evidence or automation signals.
-- Unsupported LLM labels are rejected and shown in false-positive notes.
+Requirements:
 
-Example:
+- Scan desktop, mobile, and ad-referer contexts.
+- Compare final URL, text similarity, download signals, form signals, risk score, and screenshots.
+- Support geo cloaking framework when real regional proxies are configured.
+
+### 6. Reviewer Workflow
 
 ```text
-LLM suggested "Payment Collection", but no payment evidence was found.
-Result: rejected_policy_labels = ["Payment Collection"]
+Reviewer submits landing page URL
+-> System crawls page and captures evidence
+-> System produces risk score, labels, confidence, and reasons
+-> Reviewer inspects evidence and screenshot
+-> Reviewer decides approve, reject, or escalate
+-> Scan is saved for quality analysis and policy/model feedback
 ```
 
-This keeps the LLM useful for semantic reasoning while preserving evidence-grounded enforcement.
+### 7. Success Metrics
 
-#### 7.5 Screenshot Vision
+Product metrics:
 
-Some risk content may appear in images, modals, canvas, or visual banners. When LLM reasoning is enabled, the system sends the landing page screenshot as image input.
+- Review time per landing page.
+- Risk discovery rate.
+- Evidence completeness rate.
+- Manual reviewer agreement rate.
+- Escalation rate to policy team.
+- Reviewer adoption rate.
 
-This helps detect:
+Quality metrics:
 
-- Visual warning text
-- Age gate UI
-- Image-only claims
-- Button text not captured by DOM
-- Screenshot-visible sensitive content
+- Precision.
+- Recall.
+- False positive rate.
+- False negative review sampling rate.
+- Unsupported LLM label rejection rate.
+- Average downstream exploration depth.
 
-#### 7.6 Cloaking and Environment Mismatch Detection
+Operational metrics:
 
-The system scans the same URL across multiple environments:
+- Scan success rate.
+- Timeout rate.
+- Average scan latency.
+- Screenshot capture success rate.
+- LLM fallback rate.
 
-- Desktop Chrome
-- Mobile iPhone
-- Ad-click referer
+### 8. Cross-Functional Execution Plan
 
-It compares:
+Policy team:
 
-- Final URL
-- Risk score
-- Text similarity
-- Download CTA mismatch
-- Password or form mismatch
-- Screenshots
+- Define risk categories and enforcement labels.
+- Review false-positive examples.
+- Set escalation guidelines.
 
-The system also includes a geo cloaking framework. Real geo detection requires regional proxies because locale and timezone do not change IP geolocation.
+Review operations:
 
-Example:
+- Validate whether evidence format fits reviewer workflow.
+- Provide manual labels for evaluation.
+- Identify high-friction review scenarios.
 
-```text
-US desktop → normal page
-Indonesia mobile → APK download page
-Result: high geo cloaking risk
-```
+Engineering:
 
-### 8. Scoring Logic
+- Build browser crawl, extraction, scoring, storage, and UI.
+- Implement safe dynamic exploration boundaries.
+- Monitor scan reliability and latency.
 
-The system uses a hybrid decision framework:
+AI/model team:
 
-```text
-Rule score = deterministic signal score
-LLM score = semantic risk judgment
-Final score = 0.6 * rule score + 0.4 * LLM score
-```
+- Design structured LLM output.
+- Add guardrails against unsupported labels.
+- Use reviewer feedback for prompt and model evaluation.
 
-If LLM confidence is low, the LLM weight is reduced.
+Data team:
 
-Risk levels:
+- Maintain labeled CSV or dataset.
+- Define metric calculation and reporting.
+- Track changes across product iterations.
 
-- Low: 0-39
-- Medium: 40-69
-- High: 70-100
+Legal/privacy:
 
-The system also outputs confidence and false-positive notes to support reviewer judgment.
+- Review automated interaction boundaries.
+- Approve fake data usage.
+- Define screenshot and scan data retention expectations.
 
-### 9. Evaluation Metrics
+### 9. Product Tradeoffs
 
-The product includes a labeled CSV evaluation workflow.
+Rule baseline vs LLM-only:
 
-Core metrics:
+- Decision: start with rule-based scoring and use LLM as an assistive layer.
+- Reason: reviewers and policy teams need explainability and evidence traceability.
 
-- Precision: among pages predicted risky, how many are truly risky.
-- Recall: among truly risky pages, how many were detected.
-- False positive rate: benign pages incorrectly flagged as risky.
-- Manual review agreement rate: overlap between system labels and reviewer labels.
-- Risk discovery rate: percentage of scans where downstream automation finds extra risk signals.
-- Average downstream depth: average number of downstream steps explored.
-- Rejected LLM label rate: how often guardrails reject unsupported LLM labels.
+Recall vs false positives:
 
-These metrics help product and model teams evaluate whether system changes improve real review quality.
+- Decision: expose score, confidence, evidence, and false-positive notes.
+- Reason: early product should help reviewers calibrate rather than silently enforce.
 
-### 10. MVP Implementation
+Automation depth vs safety:
+
+- Decision: controlled downstream exploration with stopping rules.
+- Reason: automated clicking can create safety, privacy, or policy risks if unbounded.
+
+MVP speed vs real geo coverage:
+
+- Decision: build geo framework but require real proxies for true geo cloaking.
+- Reason: locale and timezone changes do not prove regional content differences.
+
+Reviewer trust vs full automation:
+
+- Decision: support human decision-making first.
+- Reason: policy enforcement requires auditability and reviewer confidence.
+
+### 10. Current Implementation
 
 Current stack:
 
-- Python
-- Playwright
-- BeautifulSoup
-- FastAPI
-- Streamlit
-- SQLite
-- OpenAI Responses API with Structured Outputs
+- Python.
+- Playwright.
+- BeautifulSoup.
+- FastAPI.
+- Streamlit.
+- SQLite.
+- Optional OpenAI Structured Outputs.
 
-Current repo structure:
+Repository structure:
 
 ```text
-ad-landing-risk-analyzer/
-  backend/
-    app/
-      crawler/
-      analyzer/
-      automation/
-      llm/
-      evaluation/
-      db/
-  ui/
-  storage/
-  docs/
+backend/app/main.py                 API layer
+backend/app/scanner.py              scan orchestration
+backend/app/crawler/browser.py      browser crawl and screenshots
+backend/app/crawler/extractor.py    DOM and text extraction
+backend/app/analyzer/rules.py       risk scoring
+backend/app/automation/flow_runner.py dynamic exploration
+backend/app/analyzer/cloaking.py    environment mismatch checks
+backend/app/llm/policy_reasoner.py  LLM semantic review
+backend/app/evaluation/metrics.py   evaluation metrics
+ui/streamlit_app.py                 reviewer-facing UI
 ```
 
 ### 11. Roadmap
 
-V1: MVP Risk Analyzer
+V1: Evidence-backed MVP
 
-- URL scan
-- Rule-based score
-- Evidence extraction
-- Streamlit UI
-- SQLite history
+- URL scan.
+- Rule score.
+- Evidence extraction.
+- Screenshot capture.
+- Scan history.
+- Basic evaluation metrics.
 
-V2: Automated Downstream Exploration
+V2: Reviewer workflow improvement
 
-- Controlled browser automation
-- CTA ranking
-- Form filling
-- Screenshot trail
-- Age gate, login wall, and cookie prompt detection
+- Better evidence grouping.
+- Reviewer decision capture.
+- Feedback collection for false positives and false negatives.
+- Policy escalation workflow.
 
-V3: AI Review Layer
+V3: AI-assisted semantic review
 
-- LLM semantic review
-- Screenshot vision
-- Label guardrails
-- Hybrid score fusion
-- False-positive analysis
+- LLM summaries.
+- Screenshot vision.
+- Guardrailed policy labels.
+- Hybrid scoring.
+- Reviewer-facing false-positive explanation.
 
-V4: Advanced Risk Governance
+V4: Advanced risk governance
 
-- Multi-path exploration
-- OCR over all downstream screenshots
-- Real geo cloaking with proxy pool
-- Reviewer feedback loop
-- Clustering similar risky landing pages
-- Policy threshold tuning dashboard
-
-### 12. Business Value
-
-This system can support business integrity teams by:
-
-- Increasing downstream risk discovery
-- Reducing manual review workload
-- Improving consistency of policy decisions
-- Producing reusable evidence for reviewer decisions
-- Helping strategy teams quantify policy impact
-- Creating structured risk samples for AI model improvement
-
-This is not just a technical demo. It is an AI product prototype for ad review risk governance, covering business problem definition, risk signal abstraction, model application, evaluation design, and product iteration planning.
+- Multi-path downstream exploration.
+- OCR over screenshots.
+- Real geo cloaking with proxy pool.
+- Cluster similar risky pages.
+- Threshold tuning dashboard.
+- Model improvement feedback loop.
 
 ---
 
 ## 中文版
 
-### 1. 项目背景
+### 1. 产品背景
 
-在国际化广告审核场景中，风险不只存在于广告素材本身。一个看起来合规的广告，在用户点击后可能跳转到高风险落地页。后链路页面可能包含钓鱼、强制下载、虚假金融承诺、成人或敏感内容、隐藏文本、误导性跳转，或基于设备、来源、地域展示不同内容的 cloaking 行为。
+在广告审核中，风险经常出现在用户点击广告之后。广告素材本身可能看起来合规，但 landing page 可能跳转到钓鱼表单、虚假投资承诺、强制下载、敏感内容，或者基于设备和访问环境展示不同内容的 cloaking 页面。
 
-传统人工审核很难稳定覆盖这些风险，因为风险内容可能只在跳转、滚动、点击、表单交互、移动端渲染、广告 referer 或特定地区访问时出现。
+这个产品机会在于：帮助审核员更快、更一致地检查落地页，同时为政策、风控运营和 AI 团队提供结构化证据，用于治理和模型改进。
 
-本项目提出一个 AI 驱动的广告落地页后链路风险识别系统，结合浏览器自动化、规则信号提取、LLM 语义复核、截图视觉理解、cloaking 检测、审核证据链和评估指标体系。
+### 2. 用户问题
 
-### 2. 核心问题
+当前人工审核有几个痛点：
 
-广告后链路审核存在几个核心挑战：
-
-- 风险可能隐藏在跳转、点击、表单交互或环境差异之后。
-- 纯规则系统容易因为弱关键词命中产生误报。
-- 纯 LLM 系统如果没有证据约束，可能生成没有依据的政策标签。
-- 审核员需要可解释证据，而不是黑盒分数。
-- 产品和模型团队需要量化指标来评估系统是否真的变好。
-
-本项目目标不是构建一个简单 URL 爬虫，而是构建一个支持广告审核、风控策略分析和 AI 模型迭代的后链路风险分析工具。
+- 审核员需要手动打开链接、检查跳转、查看表单并截图留证。
+- 风险可能只在交互后，或在 mobile、ad referer、特定地区访问时出现。
+- 因为证据收集不标准，审核决策容易不一致。
+- 政策团队很难系统性看到重复出现的后链路风险模式。
+- AI/模型团队缺少带证据的结构化样本来训练和评估模型。
 
 ### 3. 目标用户
 
-- 广告审核员：查看风险证据并做出通过或拒绝决策。
-- 风控策略产品经理：分析风险模式、调整策略、定义阈值。
-- 模型和 AI 团队：使用结构化风险信号和人工反馈优化模型能力。
-- 政策团队：验证政策标签并完善执行标准。
+- 主要用户：广告审核员。
+- 次要用户：风控运营、政策团队、AI/模型团队、数据团队、风控产品经理。
 
-### 4. 产品目标
+用户需求：
 
-MVP 目标：
+- 广告审核员需要快速收集证据和可解释的风险原因。
+- 风控运营需要一致的审核流程和质量监控。
+- 政策团队需要结构化案例来完善执行标准。
+- AI/模型团队需要标注证据和误报案例。
+- PM 需要指标来判断产品是否真的提升审核质量。
 
-- 自动抓取用户提交的 landing page URL。
-- 提取标题、可见文本、隐藏文本、链接、表单、跳转链、下载信号和截图。
-- 输出可解释的风险分数、风险等级、政策标签、置信度和证据。
-- 使用 Playwright 模拟有限的用户后链路路径。
-- 使用 LLM 进行语义判断，理解页面意图并降低误报。
-- 提供评估指标来衡量系统效果。
+### 4. 目标和非目标
 
-北极星目标：
+产品目标：
 
-构建一个可扩展的 AI 辅助审核系统，提升广告后链路风险发现率，同时降低人工审核成本和误报率。
+- 降低 landing page 检查的人工审核成本。
+- 提升后链路风险发现率。
+- 提供有证据支撑的风险标签，而不是黑盒判断。
+- 通过截图、跳转链、表单证据、上下文命中和误报提示建立审核员信任。
+- 为政策和 AI 改进建立可量化反馈闭环。
 
-### 5. 风险范围
+MVP 非目标：
 
-项目范围内：
+- 无人工参与的全自动处罚。
+- 恶意文件二进制逆向。
+- 支付交易监控。
+- 版权归属验证。
+- 在没有地区代理基础设施时做真实 geo cloaking 检测。
 
-- 钓鱼和账号凭证收集
-- 成人或敏感内容
-- 虚假金融或加密货币承诺
-- 强制下载或可疑下载按钮
-- 隐藏文本或类似 cloaking 的内容隐藏
-- 误导性跳转链
-- 通过表单收集用户信息
-- 年龄门槛、登录墙、cookie consent 检测
-- 设备、User-Agent、referer 维度的环境差异
-- 基于真实地区代理的 geo cloaking 扩展框架
+### 5. MVP 需求
 
-项目范围外：
+#### 5.1 URL 扫描
 
-- 版权或媒体所有权验证
-- 恶意文件二进制逆向分析
-- 支付交易监控
-- 没有地区代理基础设施时的真实 geo cloaking
-- 用户身份验证
+审核员可以提交 landing page URL，并获得结构化扫描结果。
 
-版权盗版、恶意文件逆向、支付交易监控等属于其他治理域，当前 MVP 不作为核心范围。
+需求：
 
-### 6. 产品流程
+- URL 标准化和校验。
+- 使用浏览器自动化打开页面。
+- 捕获最终 URL 和跳转链。
+- 保存截图。
+- 持久化扫描结果，方便后续复查。
 
-```text
-输入 landing page URL
-→ Playwright 浏览器抓取
-→ DOM、文本、表单、链接、跳转链和截图提取
-→ 规则信号评分
-→ 动态用户路径模拟
-→ 截图视觉理解和 LLM 语义复核
-→ LLM 标签防幻觉约束和混合分数融合
-→ 政策标签、证据、置信度和误报分析
-→ 评估指标看板
-```
+#### 5.2 证据提取
 
-### 7. 核心能力
+系统提取面向审核员的证据。
 
-#### 7.1 静态风险扫描
+需求：
 
-系统使用 Playwright 打开 URL，并提取：
+- 页面标题和可见文本。
+- 隐藏文本块。
+- 链接和目标 URL。
+- 表单和输入字段。
+- 密码字段和手机号字段检测。
+- 下载 CTA 和强制下载检测。
+- 风险词命中和上下文片段。
 
-- 页面标题
-- 可见文本
-- 隐藏文本
-- 页面链接
-- 跳转链
-- 表单和输入字段
-- 密码字段和手机号字段
-- 下载按钮
-- 风险词和上下文片段
-- 页面截图
+#### 5.3 风险评分和标签
 
-规则层输出稳定、可解释的 baseline 风险分数。
+系统提供可解释的 baseline 风险分。
 
-#### 7.2 动态用户模拟
+需求：
 
-系统模拟受控用户路径：
+- 将提取信号转换为风险分、风险等级、政策标签、原因和置信度。
+- 每个主要 finding 都要展示证据。
+- 对弱信号或模糊信号增加误报提示。
+- 风险分最高 100，并分为 Low、Medium、High。
 
-- 滚动页面
-- 检测 consent 弹窗
-- 对可点击动作进行风险优先级排序
-- 在安全边界内点击高优先级 CTA
-- 向可见表单填入 fake data
-- 保存每一步 URL 和截图
-- 遇到年龄门槛或重复页面状态时停止
+#### 5.4 可选动态探索
 
-Action policy 会优先探索下载、领取奖励、注册、订阅、支付等更高风险路径，同时避免自动进入年龄受限内容。
+系统可以模拟有限的后链路用户行为。
 
-#### 7.3 LLM 语义复核
+需求：
 
-规则系统擅长稳定信号提取，但不擅长理解页面真实语义。LLM 层用于：
+- 滚动页面。
+- 识别候选 CTA。
+- 优先点击 download、claim、register、subscribe、payment、sign up 等高风险动作。
+- 只在安全可见表单中填写 fake data。
+- 遇到年龄门槛或重复页面状态时停止。
+- 保存后续 URL 和截图。
 
-- 页面意图分类
-- 政策标签建议
-- 语义层面的误报分析
-- 面向审核员的总结
-- 截图视觉证据观察
+#### 5.5 可选 LLM 语义复核
 
-LLM 接收结构化证据，而不是无限制的原始网页内容：
+LLM 层用于帮助审核员理解页面语义，不直接做最终处罚。
 
-```json
-{
-  "url": "...",
-  "title": "...",
-  "visible_text_excerpt": "...",
-  "forms": [],
-  "redirect_chain": [],
-  "risk_term_evidence": {},
-  "automation_steps": [],
-  "rule_findings": []
-}
-```
+需求：
 
-模型输出结构化结果：
+- 输入结构化证据，而不是无限制的原始网页内容。
+- 输出页面意图、建议政策标签、风险分、置信度、审核员总结、误报分析和支持证据。
+- 应用标签 guardrail，没有证据支持的 LLM 标签需要被拒绝或标记。
+- 只有在置信度足够时，才融合规则分和 LLM 分。
 
-```json
-{
-  "page_intent": "adult_content",
-  "policy_labels": ["Adult / Sexual Content"],
-  "llm_risk_score": 75,
-  "confidence": 0.9,
-  "reviewer_summary": "...",
-  "false_positive_assessment": [],
-  "supporting_evidence": [],
-  "visual_observations": []
-}
-```
+#### 5.6 可选 Cloaking 检测
 
-#### 7.4 LLM 标签防幻觉机制
+系统可以比较不同环境下的页面行为。
 
-为了避免 LLM 生成没有依据的政策标签，系统加入 label guardrail：
+需求：
 
-- LLM 可以建议标签。
-- 最终被接受的标签必须有规则证据或自动化信号支持。
-- 没有证据支持的 LLM 标签会被拒绝，并进入误报提示。
+- 扫描 desktop、mobile 和 ad-referer 环境。
+- 对比最终 URL、文本相似度、下载信号、表单信号、风险分和截图。
+- 在配置真实地区代理时支持 geo cloaking 框架。
 
-示例：
+### 6. 审核员工作流
 
 ```text
-LLM suggested "Payment Collection", but no payment evidence was found.
-Result: rejected_policy_labels = ["Payment Collection"]
+审核员提交 landing page URL
+-> 系统抓取页面并捕获证据
+-> 系统输出风险分、标签、置信度和原因
+-> 审核员查看证据和截图
+-> 审核员决定通过、拒绝或升级
+-> 扫描结果保存，用于质量分析和政策/模型反馈
 ```
 
-这样既保留 LLM 的语义判断能力，又保证最终审核输出有证据支撑。
+### 7. 成功指标
 
-#### 7.5 截图视觉理解
+产品指标：
 
-部分风险内容可能出现在图片、弹窗、canvas 或视觉 banner 中。启用 LLM reasoning 时，系统会将 landing page 截图作为 image input 提供给模型。
+- 单个 landing page 审核耗时。
+- 风险发现率。
+- 证据完整率。
+- 人工审核一致率。
+- 升级到政策团队的比例。
+- 审核员使用率。
 
-该能力可以帮助识别：
+质量指标：
 
-- 图片中的警告文字
-- 年龄门槛 UI
-- 仅图片中存在的风险承诺
-- DOM 未捕获的按钮文案
-- 截图中可见的敏感内容
+- Precision。
+- Recall。
+- False positive rate。
+- False negative 抽检率。
+- LLM 无证据标签拒绝率。
+- 平均后链路探索深度。
 
-#### 7.6 Cloaking 和环境差异检测
+运营指标：
 
-系统会在多个环境中扫描同一个 URL：
+- 扫描成功率。
+- 超时率。
+- 平均扫描延迟。
+- 截图成功率。
+- LLM fallback rate。
 
-- Desktop Chrome
-- Mobile iPhone
-- Ad-click referer
+### 8. 跨团队执行计划
 
-比较维度包括：
+政策团队：
 
-- 最终 URL
-- 风险分数
-- 文本相似度
-- 下载按钮差异
-- 表单或密码字段差异
-- 截图
+- 定义风险类别和执行标签。
+- 复核误报案例。
+- 设定升级审核标准。
 
-系统也预留了 geo cloaking 框架。真实 geo 检测需要地区代理，因为 locale 和 timezone 不能改变 IP 地理位置。
+审核运营：
 
-示例：
+- 验证证据格式是否符合审核流程。
+- 提供人工标签用于评估。
+- 识别高摩擦审核场景。
 
-```text
-US desktop → normal page
-Indonesia mobile → APK download page
-Result: high geo cloaking risk
-```
+工程团队：
 
-### 8. 风险评分逻辑
+- 建设浏览器抓取、信号提取、评分、存储和 UI。
+- 实现安全的动态探索边界。
+- 监控扫描可靠性和延迟。
 
-系统采用混合决策框架：
+AI/模型团队：
 
-```text
-规则分数 = 确定性风险信号分数
-LLM 分数 = 语义风险判断分数
-最终分数 = 0.6 * 规则分数 + 0.4 * LLM 分数
-```
+- 设计结构化 LLM 输出。
+- 增加无证据标签的 guardrail。
+- 使用审核反馈评估 prompt 和模型。
 
-如果 LLM 置信度较低，系统会降低 LLM 权重。
+数据团队：
 
-风险等级：
+- 维护标注 CSV 或数据集。
+- 定义指标计算和报告方式。
+- 追踪产品迭代前后的指标变化。
 
-- Low: 0-39
-- Medium: 40-69
-- High: 70-100
+法务/隐私：
 
-系统同时输出置信度和误报提示，辅助审核员判断。
+- 评估自动化交互边界。
+- 审批 fake data 使用方式。
+- 定义截图和扫描数据保留预期。
 
-### 9. 评估指标
+### 9. 产品取舍
 
-产品支持基于 labeled CSV 的评估流程。
+规则 baseline vs 纯 LLM：
 
-核心指标：
+- 决策：先用规则评分，LLM 作为辅助语义层。
+- 原因：审核员和政策团队需要可解释性和证据可追溯。
 
-- Precision：系统判为 risky 的页面中，真实 risky 的比例。
-- Recall：真实 risky 页面中，被系统发现的比例。
-- False positive rate：正常页面被误判为 risky 的比例。
-- Manual review agreement rate：系统标签和人工审核标签的一致率。
-- Risk discovery rate：动态路径模拟发现额外风险信号的比例。
-- Average downstream depth：平均探索的后链路深度。
-- Rejected LLM label rate：LLM 标签被 guardrail 拒绝的比例。
+召回率 vs 误报：
 
-这些指标帮助产品和模型团队判断系统改动是否真的提升审核质量。
+- 决策：展示分数、置信度、证据和误报提示。
+- 原因：早期产品应帮助审核员校准，而不是静默执行处罚。
 
-### 10. MVP 实现
+自动化深度 vs 安全边界：
+
+- 决策：使用带停止规则的受控后链路探索。
+- 原因：无边界自动点击可能带来安全、隐私或政策风险。
+
+MVP 速度 vs 真实 geo 覆盖：
+
+- 决策：建设 geo 框架，但真实 geo cloaking 需要真实代理。
+- 原因：locale 和 timezone 变化不能证明地区内容差异。
+
+审核员信任 vs 全自动化：
+
+- 决策：第一版优先支持人工决策。
+- 原因：政策执行需要可审计性和审核员信心。
+
+### 10. 当前实现
 
 当前技术栈：
 
-- Python
-- Playwright
-- BeautifulSoup
-- FastAPI
-- Streamlit
-- SQLite
-- OpenAI Responses API with Structured Outputs
+- Python。
+- Playwright。
+- BeautifulSoup。
+- FastAPI。
+- Streamlit。
+- SQLite。
+- 可选 OpenAI Structured Outputs。
 
-当前项目结构：
+代码结构：
 
 ```text
-ad-landing-risk-analyzer/
-  backend/
-    app/
-      crawler/
-      analyzer/
-      automation/
-      llm/
-      evaluation/
-      db/
-  ui/
-  storage/
-  docs/
+backend/app/main.py                 API 层
+backend/app/scanner.py              扫描流程编排
+backend/app/crawler/browser.py      浏览器抓取和截图
+backend/app/crawler/extractor.py    DOM 和文本提取
+backend/app/analyzer/rules.py       风险评分
+backend/app/automation/flow_runner.py 动态探索
+backend/app/analyzer/cloaking.py    环境差异检测
+backend/app/llm/policy_reasoner.py  LLM 语义复核
+backend/app/evaluation/metrics.py   评估指标
+ui/streamlit_app.py                 面向审核员的 UI
 ```
 
-### 11. 迭代路线
+### 11. 路线图
 
-V1：MVP 风险识别器
+V1: 有证据支撑的 MVP
 
-- URL 扫描
-- 规则评分
-- 证据提取
-- Streamlit UI
-- SQLite 历史记录
+- URL 扫描。
+- 规则分。
+- 证据提取。
+- 截图。
+- 扫描历史。
+- 基础评估指标。
 
-V2：自动化后链路探索
+V2: 审核员工作流优化
 
-- 受控浏览器自动化
-- CTA 优先级排序
-- 表单填充
-- 截图证据链
-- 年龄门槛、登录墙、cookie 弹窗检测
+- 更好的证据分组。
+- 审核员决策记录。
+- 误报和漏报反馈收集。
+- 政策升级流程。
 
-V3：AI 审核层
+V3: AI 辅助语义复核
 
-- LLM 语义复核
-- 截图视觉理解
-- 标签防幻觉机制
-- 混合分数融合
-- 误报分析
+- LLM 总结。
+- 截图视觉理解。
+- 带 guardrail 的政策标签。
+- 混合评分。
+- 面向审核员的误报解释。
 
-V4：高级风险治理
+V4: 高级风险治理
 
-- 多路径探索
-- 对所有 downstream 截图做 OCR
-- 接入真实地区代理池做 geo cloaking
-- 审核员反馈闭环
-- 相似风险页面聚类
-- 政策阈值调优看板
-
-### 12. 业务价值
-
-该系统可以帮助商业安全团队：
-
-- 提升广告后链路风险发现率
-- 降低人工审核成本
-- 提升政策判断一致性
-- 为审核决策提供可复用证据
-- 帮助策略团队量化政策影响
-- 为 AI 模型改进沉淀结构化风险样本
-
-这不是一个单纯技术 demo，而是一个面向广告审核风控业务的 AI 产品原型，覆盖业务问题定义、风险信号抽象、模型能力落地、评估体系设计和产品迭代规划。
+- 多路径后链路探索。
+- 截图 OCR。
+- 基于代理池的真实 geo cloaking。
+- 相似风险页面聚类。
+- 阈值调优看板。
+- 模型改进反馈闭环。
