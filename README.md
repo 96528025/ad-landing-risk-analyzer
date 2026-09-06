@@ -127,7 +127,7 @@ The implementation supports the product workflow:
 ### Setup
 
 ```bash
-cd /Users/angelren/ad-landing-risk-analyzer
+cd ad-landing-risk-analyzer
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -153,7 +153,7 @@ Without real proxies, geo cloaking is skipped because timezone and locale do not
 ### Run API
 
 ```bash
-cd /Users/angelren/ad-landing-risk-analyzer
+cd ad-landing-risk-analyzer
 source .venv/bin/activate
 uvicorn backend.app.main:app --reload --port 8000
 ```
@@ -171,7 +171,7 @@ curl -X POST http://127.0.0.1:8000/scan \
 ### Run UI
 
 ```bash
-cd /Users/angelren/ad-landing-risk-analyzer
+cd ad-landing-risk-analyzer
 source .venv/bin/activate
 streamlit run ui/streamlit_app.py
 ```
@@ -309,7 +309,7 @@ MVP 目标：
 ### 运行方式
 
 ```bash
-cd /Users/angelren/ad-landing-risk-analyzer
+cd ad-landing-risk-analyzer
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt

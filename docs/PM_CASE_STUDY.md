@@ -2,7 +2,7 @@
 
 ## English Version
 
-### 1. Interview Summary
+### 1. Summary
 
 This project is a PM case for an AI-assisted ad downstream risk review system. The core user problem is that ad risk is not always visible in the creative. A landing page can reveal phishing, forced downloads, deceptive financial claims, sensitive content, or cloaking only after a user clicks the ad.
 
@@ -171,21 +171,17 @@ Phase 4: Risk intelligence
 
 - Similar landing page clustering, trend dashboard, threshold tuning, model feedback loop.
 
-### 11. Interview Talk Track
+### 11. Design Rationale
 
-Short version:
+The primary user is the ad reviewer, but the product also serves policy, risk operations, and AI teams: reviewers need speed and clear evidence, policy teams need structured examples, and AI teams need evidence-backed samples to improve models.
 
-> I designed this as an AI-assisted downstream ad review product. The problem is that risky behavior often appears after the ad click, not in the creative itself. The MVP helps reviewers collect landing page evidence, see an explainable risk score, and make faster approve, reject, or escalate decisions. I intentionally started with evidence-backed rules for reviewer trust, then added LLM semantic review with guardrails as an assistive layer.
-
-Longer version:
-
-> My primary user was the ad reviewer, but the product also served policy, risk operations, and AI teams. Reviewers needed speed and clear evidence. Policy teams needed structured examples. AI teams needed evidence-backed samples to improve models. The MVP focused on URL scanning, screenshot capture, redirect chain, form and download detection, risk labels, and evaluation metrics. The major product tradeoff was between automation and trust, so I designed the system to support human review first rather than fully automate enforcement.
+The MVP focuses on URL scanning, screenshot capture, redirect chains, form and download detection, risk labels, and evaluation metrics. The central tradeoff is between automation and trust, which is why the system assists human review rather than automating enforcement outright: evidence-backed rules come first to establish reviewer trust, with guarded LLM semantic review added as an assistive layer.
 
 ---
 
 ## 中文版
 
-### 1. 面试总结
+### 1. 概述
 
 这个项目可以作为一个 AI 辅助广告后链路风险审核系统的 PM case。核心用户问题是：广告风险不一定出现在广告素材本身，很多风险只有在用户点击广告进入 landing page 后才出现，例如钓鱼、强制下载、虚假金融承诺、敏感内容或 cloaking。
 
@@ -354,12 +350,8 @@ Phase 4: 风险智能
 
 - 相似 landing page 聚类、趋势看板、阈值调优、模型反馈闭环。
 
-### 11. 面试讲法
+### 11. 设计取舍
 
-短版本：
+主要用户是广告审核员，但产品同时服务政策、风控运营和 AI 团队：审核员需要速度和清晰证据，政策团队需要结构化案例，AI 团队需要带证据的样本来改进模型。
 
-> 我把这个项目设计成一个 AI 辅助广告后链路审核产品。问题是很多广告风险不在素材本身，而是在点击后的 landing page 才出现。MVP 帮助审核员收集落地页证据、看到可解释风险分，并更快做出通过、拒绝或升级判断。我有意先用证据支撑的规则建立审核员信任，再加入带 guardrail 的 LLM 语义复核作为辅助层。
-
-长版本：
-
-> 我的主要用户是广告审核员，但这个产品也服务政策、风控运营和 AI 团队。审核员需要速度和清晰证据，政策团队需要结构化案例，AI 团队需要带证据的样本来改进模型。MVP 聚焦 URL 扫描、截图、跳转链、表单和下载检测、风险标签和评估指标。最大的产品取舍是自动化和信任之间的平衡，所以我先把系统设计成人工审核辅助，而不是直接做全自动处罚。
+MVP 聚焦 URL 扫描、截图、跳转链、表单和下载检测、风险标签和评估指标。最大的取舍是自动化与信任之间的平衡，因此系统被设计成人工审核的辅助而非全自动处罚：先用证据支撑的规则建立审核员信任，再加入带 guardrail 的 LLM 语义复核作为辅助层。
